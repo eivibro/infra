@@ -3,6 +3,7 @@
     environment.systemPackages = with pkgs; [
       curl
       git
+	  htop
       neovim
       tmux
       tree
