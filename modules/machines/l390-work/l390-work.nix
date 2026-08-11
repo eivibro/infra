@@ -7,6 +7,7 @@
       inputs.self.modules.nixos.common
       inputs.self.modules.nixos.hyprland
       inputs.self.modules.nixos.intelVideo
+      inputs.self.modules.nixos.work
     ];
 
     home-manager.users.eivbro.media.av1.enable = false;

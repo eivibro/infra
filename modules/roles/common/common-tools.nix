@@ -7,6 +7,7 @@
       neovim
       tmux
       tree
+	  unzip
       wget
     ];
   };

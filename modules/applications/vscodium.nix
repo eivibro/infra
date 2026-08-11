@@ -10,6 +10,7 @@
       .${pkgs.stdenv.hostPlatform.system}
       .vscode-marketplace;
   in {
+    stylix.targets.neovim.enable = true;
     stylix.targets.vscodium = {
       enable = true;
       profileNames = ["default"];
