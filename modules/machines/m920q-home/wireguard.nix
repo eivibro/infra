@@ -3,9 +3,20 @@
   # m920q at the parents' house and takes over what the pfSense
   # WG_HAAKONSVEI_M920Q tunnel does today.
   #
-  # Private keys are still plain files under /etc/wireguard, as on the machine
-  # today. Moving them into sops is a follow-up.
-  flake.modules.nixos.m920qHomeWireguard = {
+  # wg1's private key comes from sops. wg2's is still a plain file under
+  # /etc/wireguard and moves the same way once wg1 is proven.
+  flake.modules.nixos.m920qHomeWireguard = {config, ...}: {
+    # networkd reads PrivateKeyFile as systemd-network when it creates the
+    # netdev, so a root-only secret yields an interface with no key and no
+    # obvious error.
+    sops.secrets."wireguard/wg1" = {
+      sopsFile = ./secrets.yaml;
+      owner = "systemd-network";
+      group = "systemd-network";
+      mode = "0400";
+      restartUnits = ["systemd-networkd.service"];
+    };
+
     systemd.network.netdevs = {
       "30-wg1" = {
         netdevConfig = {
@@ -13,7 +24,7 @@
           Name = "wg1";
         };
         wireguardConfig = {
-          PrivateKeyFile = "/etc/wireguard/wg1-private.key";
+          PrivateKeyFile = config.sops.secrets."wireguard/wg1".path;
           ListenPort = 51436;
         };
         wireguardPeers = [
