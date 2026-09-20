@@ -27,6 +27,11 @@
           "*.jq"
           "*.lua"
           "LICENSE"
+
+          # sops signs the encrypted document, so reformatting it risks
+          # invalidating the MAC.
+          "secrets.yaml"
+          "*/secrets.yaml"
         ];
       };
     };

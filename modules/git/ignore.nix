@@ -14,6 +14,10 @@
 
       #treefmt.settings.global.excludes = ["*/.gitignore"];
     };
-    git.ignore = ["/result*"];
+    git.ignore = [
+      "/result*"
+      "/HANDOFF.md"
+      "/WIREGUARD-SOPS.md"
+    ];
   };
 }

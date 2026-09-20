@@ -3,11 +3,11 @@
     environment.systemPackages = with pkgs; [
       curl
       git
-	  htop
+      htop
       neovim
       tmux
       tree
-	  unzip
+      unzip
       wget
     ];
   };

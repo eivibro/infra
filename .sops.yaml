@@ -1,0 +1,38 @@
+# Which age recipients can decrypt which secret files.
+#
+# Both placeholders below must be replaced before `sops` will work. See the
+# "Secrets" section of README.md for the two commands that produce them.
+#
+# Only public keys belong in this file. It is committed.
+
+keys:
+  # Personal identity, used to create and edit secrets from a workstation.
+  #   age-keygen -o ~/.config/sops/age/keys.txt
+  #   age-keygen -y ~/.config/sops/age/keys.txt
+  #
+  # Back up ~/.config/sops/age/keys.txt somewhere outside this repository.
+  # Losing it makes every secret encrypted to it unrecoverable.
+  - &admin-eivbro age1ueq603kc4juwyjxe7pkq28v6ehut9ykcdxc37clqemgtg2hy4vuss46cx3
+
+  # Offline redundancy. Losing the primary above is otherwise unrecoverable.
+  - &admin-backup age1rdf6ltyy5ng4ypd44c4xxcahjxdtsmh9hhk9hgzzvu2pgd30gd4sg0u0hw
+
+  # Host identities, derived from each machine's SSH host key so that hosts can
+  # decrypt at activation time. Generated before the install, because a secret
+  # cannot be encrypted to a host whose key does not exist yet:
+  #   ssh-keygen -t ed25519 -N "" -C HOST -f ~/.local/share/nixos-host-keys/HOST/ssh_host_ed25519_key
+  #   ssh-to-age -i ~/.local/share/nixos-host-keys/HOST/ssh_host_ed25519_key.pub
+  #
+  # `nix run .#deploy` places the private half on the target via
+  # nixos-anywhere's --extra-files. Keep the originals out of this repository.
+  - &host-m920q-home age1qc6h9et8ms4nl0en0tvte90as2m9dqj245jxlltv8ycj2c3pqs3sv525ew
+
+creation_rules:
+  # Secrets live next to the module that consumes them, so a directory can be
+  # moved without breaking the reference.
+  - path_regex: modules/machines/m920q-home/secrets\.yaml$
+    key_groups:
+      - age:
+          - *admin-eivbro
+          - *admin-backup
+          - *host-m920q-home

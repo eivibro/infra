@@ -263,6 +263,26 @@
         "type": "github"
       }
     },
+    "nix-utils": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1764614525,
+        "narHash": "sha256-FIxdC7FGM3tcHrgzK9z7AlYrPpn+m1TLwkUcIVkmoqc=",
+        "owner": "femtodata",
+        "repo": "nix-utils",
+        "rev": "51a56f1aec4897618c5e3b1b9c14cb5af00293b5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "femtodata",
+        "repo": "nix-utils",
+        "type": "github"
+      }
+    },
     "nix-vscode-extensions": {
       "inputs": {
         "nixpkgs": [
@@ -363,6 +383,7 @@
         "home-manager": "home-manager",
         "import-tree": "import-tree",
         "nix-auto-follow": "nix-auto-follow",
+        "nix-utils": "nix-utils",
         "nix-vscode-extensions": "nix-vscode-extensions",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_2",
@@ -370,8 +391,29 @@
           "stylix",
           "nur"
         ],
+        "sops-nix": "sops-nix",
         "stylix": "stylix",
         "treefmt-nix": "treefmt-nix"
+      }
+    },
+    "sops-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788337237,
+        "narHash": "sha256-gkSH8VUtCo6hnysNmb9DbTuDepH2t5pv+QWjP75xKAk=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "fbf759290e0cb0a98dfc813a4eb7d53ad1dacb57",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "type": "github"
       }
     },
     "stylix": {
