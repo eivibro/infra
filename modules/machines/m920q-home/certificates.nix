@@ -28,13 +28,6 @@
           NAMECHEAP_API_KEY_FILE = config.sops.secrets."namecheap/api-key".path;
         };
 
-        # REMOVE ONCE A CERTIFICATE HAS ACTUALLY ISSUED. Production allows five
-        # duplicate certificates a week, which a misconfigured DNS provider
-        # will exhaust before the configuration is right. A staging
-        # certificate is untrusted by browsers, and that is the signal the
-        # whole chain worked: API accepted, TXT record propagated, cert issued.
-        server = "https://acme-staging-v02.api.letsencrypt.org/directory";
-
         # nginx reads the key, so it needs to be in the owning group.
         group = "nginx";
       };
