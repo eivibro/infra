@@ -11,6 +11,7 @@
       inputs.self.modules.nixos.m920qHomeNetwork
       inputs.self.modules.nixos.m920qHomeFirewall
       inputs.self.modules.nixos.m920qHomeIotDevices
+      inputs.self.modules.nixos.m920qHomeCertificates
       inputs.self.modules.nixos.m920qHomeWireguard
     ];
 
