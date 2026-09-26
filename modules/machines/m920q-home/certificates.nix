@@ -35,8 +35,8 @@
         # whole chain worked: API accepted, TXT record propagated, cert issued.
         server = "https://acme-staging-v02.api.letsencrypt.org/directory";
 
-        # group stays at its default until nginx exists to consume this; it
-        # then becomes "nginx" so the proxy can read the key.
+        # nginx reads the key, so it needs to be in the owning group.
+        group = "nginx";
       };
     };
   };
