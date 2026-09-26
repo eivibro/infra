@@ -50,11 +50,6 @@
             iifname "wg2" accept comment "wg2 to router"
             iifname "wg1" accept comment "WireGuard to router"
 
-            # REMOVE BEFORE THIS MACHINE BECOMES THE EDGE ROUTER. Reachable
-            # only from the pfSense LAN while it sits behind pfSense; on the
-            # frontier it is SSH published to the internet.
-            iifname "wan0" tcp dport 22 accept comment "temporary SSH from WAN"
-
             iifname "wan0" udp dport 51436 accept comment "wg1 roadwarrior handshake"
 
             iifname "wan0" ip saddr {
