@@ -1,22 +1,21 @@
 {
-  flake.modules.nixos.m920qHomeFirewall = let
-    # Only these IoT addresses reach the internet. Everything else on vlan81
-    # still gets DHCP, DNS and NTP from the router, which for most devices is
-    # all they need. Adding a device here is the one-line change that gives it
-    # egress.
-    iotInternetAllowed = [
-      # "192.168.81.21" # Samsung washer, needs SmartThings
-      # "192.168.81.22" # Samsung dryer, needs SmartThings
-      #
-      # Only addresses outside the DHCP pool belong here. Allow-listing a
-      # dynamic lease grants egress to whichever device happens to hold it, so
-      # a device needs a static reservation before it gets a line above.
-    ];
+  flake.modules.nixos.m920qHomeFirewall = {
+    config,
+    lib,
+    ...
+  }: let
+    # Derived from iot.devices so a device's address and its egress policy
+    # cannot drift apart.
+    iotOnline =
+      config.iot.devices
+      |> lib.filterAttrs (_: device: device.internet)
+      |> lib.attrValues
+      |> map (device: device.address);
 
     iotOnlineSet =
-      if iotInternetAllowed == []
+      if iotOnline == []
       then ""
-      else "elements = { ${builtins.concatStringsSep ", " iotInternetAllowed} }";
+      else "elements = { ${lib.concatStringsSep ", " iotOnline} }";
   in {
     boot.kernel.sysctl = {
       "net.ipv4.conf.wan0.rp_filter" = 1;

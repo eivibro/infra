@@ -10,6 +10,7 @@
       inputs.self.modules.nixos.switchFix
       inputs.self.modules.nixos.m920qHomeNetwork
       inputs.self.modules.nixos.m920qHomeFirewall
+      inputs.self.modules.nixos.m920qHomeIotDevices
       inputs.self.modules.nixos.m920qHomeWireguard
     ];
 
@@ -42,7 +43,9 @@
         # that interface's own address.
         dhcp-range = [
           "192.168.80.100,192.168.80.200,12h"
-          "192.168.81.100,192.168.81.200,12h"
+          # The IoT pool starts at .150 to leave room for the reservations,
+          # which carry over the last octet each device had under pfSense.
+          "192.168.81.150,192.168.81.250,12h"
           "192.168.82.100,192.168.82.200,12h"
         ];
 
