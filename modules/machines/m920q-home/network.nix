@@ -25,9 +25,42 @@
       };
     };
 
-    systemd.network.netdevs."br-lan".netdevConfig = {
-      Name = "br-lan";
-      Kind = "bridge";
+    systemd.network.netdevs = {
+      "br-lan".netdevConfig = {
+        Name = "br-lan";
+        Kind = "bridge";
+      };
+
+      # The VLANs carried on the trunk to the TL-SG105PE. They hang off lan3
+      # rather than off the bridge, because a VLAN interface on a bridge
+      # *member* never receives anything: the bridge claims frames first. lan3
+      # is deliberately not a bridge member, so its VLAN children work, and
+      # vlan80 is enslaved to the bridge instead.
+      #
+      # The switch presents 80 untagged to the access point and tagged to this
+      # trunk, so the AP keeps its management VLAN native and recovery through
+      # its fallback address stays possible.
+      "vlan80" = {
+        netdevConfig = {
+          Name = "vlan80";
+          Kind = "vlan";
+        };
+        vlanConfig.Id = 80;
+      };
+      "vlan81" = {
+        netdevConfig = {
+          Name = "vlan81";
+          Kind = "vlan";
+        };
+        vlanConfig.Id = 81;
+      };
+      "vlan82" = {
+        netdevConfig = {
+          Name = "vlan82";
+          Kind = "vlan";
+        };
+        vlanConfig.Id = 82;
+      };
     };
 
     systemd.network.networks = {
@@ -43,17 +76,43 @@
         matchConfig.Name = "lan2";
         networkConfig.Bridge = "br-lan";
       };
-      "10-lan-port3" = {
+
+      # Trunk to the switch. Carries no address of its own; everything rides on
+      # the tagged children.
+      "15-trunk" = {
         matchConfig.Name = "lan3";
+        vlan = [
+          "vlan80"
+          "vlan81"
+          "vlan82"
+        ];
+        networkConfig.LinkLocalAddressing = "no";
+      };
+
+      # VLAN 80 joins the flat LAN, so the access point's main network shares
+      # one broadcast domain with the wired ports.
+      "16-vlan80" = {
+        matchConfig.Name = "vlan80";
         networkConfig.Bridge = "br-lan";
       };
 
+      # ConfigureWithoutCarrier throughout: dnsmasq needs an address to serve
+      # from even when nothing is plugged into the trunk yet.
       "20-br-lan" = {
         matchConfig.Name = "br-lan";
         address = ["192.168.80.1/24"];
+        networkConfig.ConfigureWithoutCarrier = true;
+      };
 
-        # The bridge has to carry its address even with every port empty, or
-        # dnsmasq has nothing to bind to.
+      "21-iot" = {
+        matchConfig.Name = "vlan81";
+        address = ["192.168.81.1/24"];
+        networkConfig.ConfigureWithoutCarrier = true;
+      };
+
+      "22-guest" = {
+        matchConfig.Name = "vlan82";
+        address = ["192.168.82.1/24"];
         networkConfig.ConfigureWithoutCarrier = true;
       };
 

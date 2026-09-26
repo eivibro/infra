@@ -27,14 +27,41 @@
     services.dnsmasq = {
       enable = true;
       settings = {
-        interface = ["br-lan"];
-        bind-interfaces = true;
-        listen-address = ["127.0.0.1" "192.168.80.1"];
-        dhcp-range = ["192.168.80.100,192.168.80.200,12h"];
+        # bind-dynamic rather than bind-interfaces: with three segments plus a
+        # trunk that may have no carrier, binding a fixed address list at
+        # startup means dnsmasq can fail before networkd has finished.
+        interface = [
+          "lo"
+          "br-lan"
+          "vlan81"
+          "vlan82"
+        ];
+        bind-dynamic = true;
+
+        # dnsmasq advertises itself as gateway and resolver per interface, from
+        # that interface's own address.
+        dhcp-range = [
+          "192.168.80.100,192.168.80.200,12h"
+          "192.168.81.100,192.168.81.200,12h"
+          "192.168.82.100,192.168.82.200,12h"
+        ];
+
         server = ["1.1.1.1" "8.8.8.8"];
         domain-needed = true;
         bogus-priv = true;
       };
+    };
+
+    # Time is served locally so that IoT devices denied internet access still
+    # get a clock, and so the nat prerouting redirect has somewhere to land.
+    services.timesyncd.enable = false;
+    services.chrony = {
+      enable = true;
+      extraConfig = ''
+        allow 192.168.80.0/24
+        allow 192.168.81.0/24
+        allow 192.168.82.0/24
+      '';
     };
 
     # Everything else this machine had is already in the common role or the
