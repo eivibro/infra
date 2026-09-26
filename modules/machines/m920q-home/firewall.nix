@@ -46,6 +46,15 @@
           chain input {
             type filter hook input priority filter; policy drop;
 
+            # Conntrack before filtering. The anti-spoofing rule below drops
+            # RFC1918 sources arriving on wan0, which is right for new inbound
+            # connections but also matched the replies to connections this
+            # router made itself — nginx reaching a backend upstream of wan0
+            # timed out because of it. Established flows are ones we already
+            # allowed or initiated, so they are judged first.
+            iif "lo" accept
+            ct state established,related accept
+
             iifname "wan0" udp dport 51437 accept comment "wg2 site-to-site"
             iifname "wg2" accept comment "wg2 to router"
             iifname "wg1" accept comment "WireGuard to router"
@@ -58,8 +67,6 @@
               255.255.255.255/32
             } log prefix "SPOOF-INP: " drop comment "anti-spoofing"
 
-            iif "lo" accept
-            ct state established,related accept
             iifname { "br-lan", "lan0", "lan1", "lan2", "lan3" } accept comment "LAN to router"
 
             # IoT and Guest get the router's services and nothing else: no SSH,
