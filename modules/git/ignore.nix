@@ -18,6 +18,7 @@
       "/result*"
       "/HANDOFF.md"
       "/WIREGUARD-SOPS.md"
+      "/CUTOVER.md"
     ];
   };
 }
