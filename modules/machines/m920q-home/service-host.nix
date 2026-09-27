@@ -17,6 +17,6 @@
       '';
     };
 
-    config.homeServices.host = "192.168.41.2";
+    config.homeServices.host = "192.168.80.2";
   };
 }
