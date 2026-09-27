@@ -95,6 +95,15 @@
             # anything toward the LAN, and conntrack above carries the replies.
             iifname "br-lan" oifname "vlan81" accept comment "LAN to IoT"
 
+            # Shelly devices open connections towards Home Assistant rather
+            # than waiting to be polled, so the rule above does not cover them:
+            # gen1 pushes CoIoT over UDP 5683, gen2 holds a websocket open.
+            # Narrow enough to stay closed in spirit — one host, two ports.
+            # ESPHome needs nothing here; Home Assistant connects out to those
+            # on TCP 6053, which the rule above already allows.
+            iifname "vlan81" ip daddr ${config.homeServices.host} udp dport 5683 accept comment "Shelly gen1 CoIoT"
+            iifname "vlan81" ip daddr ${config.homeServices.host} tcp dport 8123 accept comment "Shelly gen2 websocket"
+
             iifname "vlan81" oifname "wan0" ip saddr @iot_online accept comment "allow-listed IoT to internet"
             iifname "vlan82" oifname "wan0" accept comment "Guest to internet"
 

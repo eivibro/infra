@@ -6,13 +6,16 @@
   # the service actually runs. Porting a service off the Arch box becomes a
   # per-entry `host` override, and the Arch box's own move at cutover is a
   # single change to archBox.
-  flake.modules.nixos.m920qHomeProxy = {lib, ...}: let
+  flake.modules.nixos.m920qHomeProxy = {
+    config,
+    lib,
+    ...
+  }: let
     domain = "brox.tech";
 
-    # The Arch box being phased out. Its address disappears with the
-    # 192.168.41.0/24 segment at cutover, at which point this is the only line
-    # that changes.
-    archBox = "192.168.41.2";
+    # Declared once in service-host.nix, because the firewall rules that let
+    # Shelly devices reach Home Assistant need the same address.
+    archBox = config.homeServices.host;
 
     # Where the names resolve to on the LAN: this router.
     proxyAddress = "192.168.80.1";
