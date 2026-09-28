@@ -25,7 +25,15 @@
       after = ["network-online.target"];
       wants = ["network-online.target"];
 
-      path = [pkgs.iproute2 pkgs.curl];
+      # Every command the script calls, named explicitly. A unit's PATH is not
+      # the login shell's: an earlier version reached for awk, which is not in
+      # NixOS's default service PATH, and the failure fell into the "no
+      # address" branch and exited 0 — looking like a clean run every time.
+      path = [
+        pkgs.coreutils
+        pkgs.curl
+        pkgs.iproute2
+      ];
 
       serviceConfig = {
         Type = "oneshot";
@@ -35,11 +43,16 @@
       script = ''
             set -u
 
-            address=$(ip -4 -brief addr show wan0 | awk '{print $3}' | cut -d/ -f1)
-            if [ -z "$address" ]; then
+            # Parsed with shell builtins rather than awk or cut, so the only
+            # thing this needs on PATH is ip itself. Field 3 of -brief output
+            # is the address with its prefix:
+            #   wan0  UP  198.51.100.4/24  metric 1024
+            set -- $(ip -4 -brief addr show wan0)
+            if [ "$#" -lt 3 ]; then
               echo "wan0 has no address yet; nothing to compare"
               exit 0
             fi
+            address="''${3%%/*}"
 
             state="$STATE_DIRECTORY/address"
             previous=$(cat "$state" 2>/dev/null || true)
