@@ -31,6 +31,13 @@
     # localhost, which would then need a proxy on that host rather than this
     # one.
     proxied = {
+      # Runs on this machine rather than the Arch box, so it overrides the
+      # default backend host.
+      contacts = {
+        host = "127.0.0.1";
+        port = 5232;
+      };
+
       hass.port = 8123;
       navidrome.port = 4533;
       ntfy.port = 8085;
