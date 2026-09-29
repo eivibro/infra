@@ -23,15 +23,20 @@
     # Ports carried over from the pfSense HAProxy backends. Add `host = ...` to
     # an entry once that service has been ported somewhere else.
     #
-    # zigbee2mqtt is deliberately absent: it is reached through the Home
-    # Assistant panel, and Home Assistant learns about the devices over MQTT
-    # rather than through its web interface, so nothing needs it published.
+    # zigbee2mqtt is here for the Home Assistant iframe panel, which loads
+    # https://zigbee.brox.tech in the browser. Dropping the vhost did not make
+    # it any less reachable — its container publishes 0.0.0.0:8083, so the LAN
+    # can reach it directly regardless — it only removed the name and the TLS
+    # the panel needs. Restricting it properly means binding the container to
+    # localhost, which would then need a proxy on that host rather than this
+    # one.
     proxied = {
       hass.port = 8123;
       navidrome.port = 4533;
       ntfy.port = 8085;
       paperless.port = 8001;
       vaultwarden.port = 8082;
+      zigbee.port = 8083;
     };
   in {
     services.nginx = {

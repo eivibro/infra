@@ -10,7 +10,7 @@
   #   .1  this router
   #   .2  the service host, statically configured on the box itself
   #   .3  the access point
-  #   .4  free, earmarked for the switch if its management moves off VLAN 1
+  #   .4  the managed switch
   flake.modules.nixos.m920qHomeLanDevices = {
     config,
     lib,
@@ -41,6 +41,15 @@
         "nwa50ax" = {
           mac = "b8:ec:a3:dc:4e:60";
           address = "192.168.80.3";
+        };
+
+        # TP-Link TL-SG105PE. Its management took a DHCP address on this
+        # segment of its own accord once the VLANs were in place, which is
+        # tidier than the VLAN 1 arrangement it started on — but a pool address
+        # on the one device that carries the router's trunk is worth pinning.
+        "tl-sg105pe" = {
+          mac = "b0:a7:b9:6f:49:47";
+          address = "192.168.80.4";
         };
       };
 
