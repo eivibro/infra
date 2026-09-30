@@ -43,14 +43,6 @@
       ntfy.port = 8085;
       paperless.port = 8001;
       vaultwarden.port = 8082;
-
-      # Temporary hostname for the new Vaultwarden while the old container
-      # still answers on vaultwarden.brox.tech. At cutover this entry goes and
-      # vaultwarden above gains the same host override.
-      vault-new = {
-        host = "127.0.0.1";
-        port = 8222;
-      };
       zigbee.port = 8083;
     };
   in {

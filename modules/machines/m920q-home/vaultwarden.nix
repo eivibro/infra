@@ -48,11 +48,6 @@
         # the owner.
         SHOW_PASSWORD_HINT = false;
       };
-
-      # Periodic SQLite snapshots. Same disk as the live database, so this
-      # guards against corruption and mistakes rather than hardware — the
-      # offsite copy to the m920q at the parents' house is the real answer.
-      backupDir = "/var/backup/vaultwarden";
     };
   };
 }
