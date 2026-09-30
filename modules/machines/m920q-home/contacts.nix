@@ -5,7 +5,36 @@
   # Radicale keeps each contact as a plain vCard file on disk — no database, no
   # PHP — which is both the reason it is light enough to sit on the router and
   # the reason backing it up is a matter of copying a directory.
-  flake.modules.nixos.m920qHomeContacts = {config, ...}: {
+  flake.modules.nixos.m920qHomeContacts = {
+    config,
+    lib,
+    pkgs,
+    ...
+  }: {
+    # bcrypt below is only honoured if that package is in Radicale's closure.
+    # It is a declared dependency in nixpkgs today, but nothing about this
+    # configuration would notice if that changed: logins would simply start
+    # failing after a flake update, with the service itself running happily.
+    # Fail the build instead. Both attribute names are checked because nixpkgs
+    # has moved Python dependencies between them before.
+    assertions = [
+      {
+        assertion = let
+          declared =
+            (pkgs.radicale.dependencies or [])
+            ++ (pkgs.radicale.propagatedBuildInputs or []);
+        in
+          lib.any (dep: lib.hasInfix "bcrypt" (dep.name or "")) declared;
+
+        message = ''
+          Radicale is configured for bcrypt password hashing, but bcrypt is not
+          among its declared dependencies in this nixpkgs. Either add it to the
+          package or set htpasswd_encryption to sha512, which needs nothing
+          beyond the standard library.
+        '';
+      }
+    ];
+
     sops.secrets."radicale/htpasswd" = {
       sopsFile = ./secrets.yaml;
 
