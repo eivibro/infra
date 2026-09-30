@@ -4,7 +4,11 @@
   ...
 }: {
   flake-file.inputs = {
-    disko.url = "github:nix-community/disko";
+    disko = {
+      url = "github:nix-community/disko";
+      # Without this, disko drags in a second nixpkgs of its own.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   flake.modules.nixos.laptopDisko = {lib, ...}: {
     imports = [
