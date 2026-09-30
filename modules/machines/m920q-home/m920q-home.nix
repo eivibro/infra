@@ -17,6 +17,7 @@
       inputs.self.modules.nixos.m920qHomeContacts
       inputs.self.modules.nixos.m920qHomeProxy
       inputs.self.modules.nixos.m920qHomeServiceHost
+      inputs.self.modules.nixos.m920qHomeVaultwarden
       inputs.self.modules.nixos.m920qHomeWireguard
     ];
 
