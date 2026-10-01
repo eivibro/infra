@@ -42,7 +42,14 @@
       navidrome.port = 4533;
       ntfy.port = 8085;
       paperless.port = 8001;
-      vaultwarden.port = 8082;
+
+      # Runs on this machine now, taking over from the container's
+      # 0.0.0.0:8082.
+      vaultwarden = {
+        host = "127.0.0.1";
+        port = 8222;
+      };
+
       zigbee.port = 8083;
     };
   in {

@@ -20,6 +20,15 @@
       restartUnits = ["vaultwarden.service"];
     };
 
+    # ADMIN_TOKEN in that file is an Argon2 PHC string, generated from the
+    # flake's own pin rather than the default channel:
+    #   nix shell --accept-flake-config "<nixpkgs tarball URL in flake.lock>#vaultwarden" -c vaultwarden hash
+    # It prompts for an admin password and prints the hash. Edit it into
+    # secrets.yaml single-quoted, e.g. ADMIN_TOKEN='$argon2id$v=19$...' —
+    # systemd reads EnvironmentFile without a shell, so the `$` need no
+    # escaping. Do not double them to `$$`; that is a docker-compose quirk and
+    # would corrupt the hash here.
+
     services.vaultwarden = {
       enable = true;
       dbBackend = "sqlite";
@@ -32,10 +41,8 @@
 
       config = {
         # Must match the URL actually used, or the web vault misbehaves and
-        # WebAuthn refuses to enrol. Points at the temporary hostname while the
-        # old instance still owns vaultwarden.brox.tech; both this and the vhost
-        # change together at cutover.
-        DOMAIN = "https://vault-new.brox.tech";
+        # WebAuthn refuses to enrol.
+        DOMAIN = "https://vaultwarden.brox.tech";
 
         ROCKET_ADDRESS = "127.0.0.1";
         ROCKET_PORT = 8222;
