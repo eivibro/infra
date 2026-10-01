@@ -10,25 +10,7 @@
   # Note that an export carries logins, cards, identities, notes, folders,
   # custom fields and TOTP secrets, but not file attachments, per-item password
   # history, Sends, or trash.
-  flake.modules.nixos.m920qHomeVaultwarden = {config, ...}: {
-    sops.secrets."vaultwarden/env" = {
-      sopsFile = ./secrets.yaml;
-
-      # Read by systemd as EnvironmentFile before privileges are dropped, so
-      # this stays root-owned rather than being handed to the service user.
-      mode = "0400";
-      restartUnits = ["vaultwarden.service"];
-    };
-
-    # ADMIN_TOKEN in that file is an Argon2 PHC string, generated from the
-    # flake's own pin rather than the default channel:
-    #   nix shell --accept-flake-config "<nixpkgs tarball URL in flake.lock>#vaultwarden" -c vaultwarden hash
-    # It prompts for an admin password and prints the hash. Edit it into
-    # secrets.yaml single-quoted, e.g. ADMIN_TOKEN='$argon2id$v=19$...' —
-    # systemd reads EnvironmentFile without a shell, so the `$` need no
-    # escaping. Do not double them to `$$`; that is a docker-compose quirk and
-    # would corrupt the hash here.
-
+  flake.modules.nixos.m920qHomeVaultwarden = {
     services.vaultwarden = {
       enable = true;
       dbBackend = "sqlite";
@@ -36,8 +18,6 @@
       # nginx here already owns every vhost; letting this module write its own
       # would mean two places deciding how it is served.
       configureNginx = false;
-
-      environmentFile = config.sops.secrets."vaultwarden/env".path;
 
       config = {
         # Must match the URL actually used, or the web vault misbehaves and
@@ -47,8 +27,22 @@
         ROCKET_ADDRESS = "127.0.0.1";
         ROCKET_PORT = 8222;
 
-        # The account is created once through the admin page, which is what
-        # ADMIN_TOKEN in the environment file is for.
+        # Closes public registration. The admin page that would invite new
+        # accounts is disabled too — no ADMIN_TOKEN reaches the service
+        # environment, which is what Vaultwarden gates the page on — so this
+        # instance currently has no way to create an account at all. That is
+        # deliberate with a single user, and it also keeps the admin UI from
+        # writing the config.json described above.
+        #
+        # The token itself is kept, still encrypted, as vaultwarden/env in
+        # secrets.yaml. To add an account later, restore the two things this
+        # module no longer has — a sops.secrets."vaultwarden/env" entry and an
+        # environmentFile pointing at it — then deploy, invite the address at
+        # /admin, and register that same address at /#/signup. With no SMTP the
+        # invite
+        # sends no mail, it only creates the invited row that makes the signup
+        # legal. Do not reach for DISABLE_ADMIN_TOKEN; it bypasses the password
+        # rather than disabling the page.
         SIGNUPS_ALLOWED = false;
 
         # A password hint is a hint to anyone who can ask for it, not just to
