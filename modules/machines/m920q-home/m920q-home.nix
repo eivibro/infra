@@ -13,6 +13,7 @@
       inputs.self.modules.nixos.m920qHomeIotDevices
       inputs.self.modules.nixos.m920qHomeLanDevices
       inputs.self.modules.nixos.m920qHomeWanAddressWatch
+      inputs.self.modules.nixos.m920qHomeBooks
       inputs.self.modules.nixos.m920qHomeCertificates
       inputs.self.modules.nixos.m920qHomeContacts
       inputs.self.modules.nixos.m920qHomeProxy
