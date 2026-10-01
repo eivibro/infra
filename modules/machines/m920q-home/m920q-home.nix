@@ -44,6 +44,13 @@
           "br-lan"
           "vlan81"
           "vlan82"
+
+          # Roadwarriors resolve through this router too, so queries arriving
+          # on the tunnel have to be answered. bind-dynamic is access
+          # controlled by arrival interface, so without wg1 listed a query
+          # from 10.202.0.2 is ignored even when it is addressed to
+          # 192.168.80.1.
+          "wg1"
         ];
         bind-dynamic = true;
 
