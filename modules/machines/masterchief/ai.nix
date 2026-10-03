@@ -51,7 +51,11 @@
     services.litellm = {
       enable = true;
       port = 4000;
-      host = "192.168.44.10";
+
+      # Loopback only: Open WebUI on this machine is the one client. This was
+      # the pfSense-era LAN address, which this machine no longer has, so
+      # binding it failed with "cannot assign requested address".
+      host = "127.0.0.1";
 
       # Point to the sops-rendered env file
       environmentFile = config.sops.templates."litellm.env".path;
@@ -393,7 +397,7 @@
       environmentFile = config.sops.templates."openwebui.env".path;
       environment = {
         ENABLE_OLLAMA_API = "false";
-        OPENAI_API_BASE_URL = "http://192.168.44.10:4000/v1";
+        OPENAI_API_BASE_URL = "http://127.0.0.1:4000/v1";
         WEBUI_NAME = "My AI";
         ENABLE_SIGNUP = "false";
         DEFAULT_USER_ROLE = "admin";
