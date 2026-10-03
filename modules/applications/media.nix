@@ -21,7 +21,7 @@
 
     onlineVideoFormat =
       lib.concatMapStringsSep "/" (
-        codec: "bv[height<=?1080][vcodec^=${codec}]+ba"
+        codec: "bv[height<=?${toString config.media.maxHeight}][vcodec^=${codec}]+ba"
       )
       preferredVideoCodecs;
   in {
@@ -31,6 +31,15 @@
       description = ''
         Whether mpv and yt-dlp may select AV1 when choosing an online
         video format.
+      '';
+    };
+
+    options.media.maxHeight = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 1080;
+      description = ''
+        The tallest video stream mpv and yt-dlp may select when choosing an
+        online video format.
       '';
     };
 

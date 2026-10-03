@@ -27,6 +27,11 @@ keys:
   # nixos-anywhere's --extra-files. Keep the originals out of this repository.
   - &host-m920q-home age1qc6h9et8ms4nl0en0tvte90as2m9dqj245jxlltv8ycj2c3pqs3sv525ew
 
+  # Not installed through `nix run .#deploy`: masterchief came over from the
+  # previous configuration with its host key already in place, so this was
+  # derived from the live /etc/ssh/ssh_host_ed25519_key.pub.
+  - &host-masterchief age17kerjtdlttvrca54caq5t0v5kqpatkyv0z7mx4280efr93nuy48sgk0lw3
+
 creation_rules:
   # Secrets live next to the module that consumes them, so a directory can be
   # moved without breaking the reference.
@@ -36,3 +41,10 @@ creation_rules:
           - *admin-eivbro
           - *admin-backup
           - *host-m920q-home
+
+  - path_regex: modules/machines/masterchief/secrets\.yaml$
+    key_groups:
+      - age:
+          - *admin-eivbro
+          - *admin-backup
+          - *host-masterchief

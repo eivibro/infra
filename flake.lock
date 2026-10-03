@@ -364,6 +364,26 @@
         "type": "github"
       }
     },
+    "paseo": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790962698,
+        "narHash": "sha256-38xV0vRXu1NssSwoPw0CXinwGs+ROn1bZV/dFAUflnI=",
+        "owner": "getpaseo",
+        "repo": "paseo",
+        "rev": "8608525496c52debc7ece8ec24023f1733a4df7f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "getpaseo",
+        "repo": "paseo",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "disko": "disko",
@@ -381,6 +401,7 @@
           "stylix",
           "nur"
         ],
+        "paseo": "paseo",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
         "treefmt-nix": "treefmt-nix"

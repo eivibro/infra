@@ -3,7 +3,11 @@
 {
   outputs = inputs: inputs.flake-parts.lib.mkFlake {inherit inputs;} (inputs.import-tree ./modules);
 
-  nixConfig = {extra-experimental-features = ["pipe-operators"];};
+  nixConfig = {
+    extra-experimental-features = ["pipe-operators"];
+    extra-substituters = ["https://cache.nixos-cuda.org"];
+    extra-trusted-public-keys = ["cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="];
+  };
 
   inputs = {
     disko = {
@@ -42,6 +46,10 @@
     };
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nur.follows = "stylix/nur";
+    paseo = {
+      url = "github:getpaseo/paseo";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
