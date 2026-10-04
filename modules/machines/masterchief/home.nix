@@ -57,14 +57,28 @@
       hwdec-codecs = "h264,hevc,vp8,vp9";
     };
 
+    # The previous configuration themed Neovim through Stylix's autoEnable,
+    # which this repository turns off; l390-work gets it from vscodium.nix.
+    stylix.targets.neovim.enable = true;
+
     programs.neovim = {
       enable = true;
       defaultEditor = true;
+
+      # Both default to true only because home.stateVersion predates 26.05.
+      # No plugin here uses either provider, so take the current default.
+      withPython3 = false;
+      withRuby = false;
+
       initLua = ''
         vim.opt.relativenumber = true
         vim.opt.cursorline = true
       '';
     };
+
+    # Pinned to where the profile already lives. The 26.05 default is under
+    # ~/.config, and adopting it means moving the profile directory by hand.
+    programs.firefox.configPath = ".mozilla/firefox";
 
     programs.bash = {
       enable = true;
