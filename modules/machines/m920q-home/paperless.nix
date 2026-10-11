@@ -1,22 +1,10 @@
 {
-  # Paperless-ngx, taking over from the container on the Arch box.
+  # Paperless-ngx on this machine, taking over from the container on the
+  # Arch box.
   #
-  # NOT YET LIVE. This file is deliberately not imported by m920q-home.nix,
-  # and services-proxy.nix still points paperless.brox.tech at the container
-  # on the Arch box. Going live is those two edits together — the import line
-  # and the proxied entry — never one without the other, or the vhost proxies
-  # to a port nothing listens on.
-  #
-  # What is blocking: nixpkgs' paperless-ngx depends unconditionally on
-  # sentence-transformers, hence torchaudio, hence torchcodec 0.16.0, whose
-  # test suite fails eight mp3 encoder cases on the pinned nixpkgs
-  # (b6c8664de9b6, 2026-09-29). Not local and not in the binary cache —
-  # Hydra fails it identically. Upstream already fixed it twice over, in
-  # NixOS/nixpkgs#568426 (skip the failing test, merged 2026-09-30) and
-  # #568668 (0.17.0, merged 2026-10-01), but neither has reached the
-  # nixpkgs-unstable channel yet: as of 2026-10-02 that channel is still at
-  # the very revision pinned here, so `nix flake update nixpkgs` is a no-op.
-  # Re-check the channel, update the pin, then flip the two lines.
+  # Imported by m920q-home.nix. It listens on 127.0.0.1:28981, and
+  # services-proxy.nix sends paperless.brox.tech there. The Arch container
+  # is still on :8001 and is no longer behind that name.
   #
   # The container could be reached by address but not logged into through
   # https://paperless.brox.tech. Since Django 4.0 an unsafe request — the login
@@ -27,17 +15,25 @@
   # name was broken. `domain` below is what sets PAPERLESS_URL, so logging in
   # works here by virtue of the service having been told its own name.
   #
-  # Migrated with document_exporter and document_importer rather than by
-  # copying the database. The export is a JSON manifest plus the files, which
-  # is what allowed the container's PostgreSQL to become SQLite here. Two
-  # things about that route are worth not rediscovering: the importer wants an
-  # otherwise empty instance, and it refuses an export written by a different
-  # version of paperless — which is why the container had to be walked from
-  # 1.7.1 up to this version before exporting, by way of 2.20.15, because v3
-  # can only be upgraded to from 2.20.15.
-  flake.modules.nixos.m920qHomePaperless = {
+  # Documents move by copying the container's documents/originals into
+  # /var/lib/paperless/consume, which re-OCRs them into this SQLite database.
+  # The container's Postgres is not imported. document_importer would refuse
+  # that 1.7.1 database anyway: it wants an empty instance of the same version,
+  # and v3 can only be upgraded to from 2.20.15.
+  flake.modules.nixos.m920qHomePaperless = {config, ...}: {
+    # The scheduler's preStart reads this through systemd's credential store
+    # and creates the user on first start. A later change of the file resets
+    # the password; renaming PAPERLESS_ADMIN_USER leaves the old user in place.
+    sops.secrets."paperless/admin-password" = {
+      sopsFile = ./secrets.yaml;
+      mode = "0400";
+      restartUnits = ["paperless-scheduler.service"];
+    };
+
     services.paperless = {
       enable = true;
+
+      passwordFile = config.sops.secrets."paperless/admin-password".path;
 
       # Sets PAPERLESS_URL, and through it ALLOWED_HOSTS, CORS_ALLOWED_HOSTS
       # and CSRF_TRUSTED_ORIGINS. The hostname only — the module prefixes
@@ -67,6 +63,10 @@
         # documents unsearchable. nixpkgs' tesseract5 ships every language
         # file, so this needs no package override.
         PAPERLESS_OCR_LANGUAGE = "nor+eng";
+
+        # The module's own default is "admin". Set explicitly so a rebuild
+        # does not grow a second account beside this one.
+        PAPERLESS_ADMIN_USER = "eivbro";
       };
 
       # configureTika stays at its default false. It would enable both Tika and

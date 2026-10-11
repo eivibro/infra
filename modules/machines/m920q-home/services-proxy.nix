@@ -41,7 +41,12 @@
       hass.port = 8123;
       navidrome.port = 4533;
       ntfy.port = 8085;
-      paperless.port = 8001;
+      # The library lives on this machine. The Arch container is still up on
+      # :8001 and is no longer what this name serves.
+      paperless = {
+        host = "127.0.0.1";
+        port = 28981;
+      };
 
       # Runs on this machine now, taking over from the container's
       # 0.0.0.0:8082.
